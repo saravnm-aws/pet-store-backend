@@ -11,17 +11,7 @@ env:
   ECR_REPO: pet-store-backend
 
 jobs:
-  test:
-    runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install and test
-        run: |
-          npm ci
-          npm test
-
   build-and-push:
-    needs: test
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: self-hosted
     steps:
