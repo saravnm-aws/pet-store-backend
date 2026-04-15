@@ -5,11 +5,19 @@ const modelPath = process.env.USE_LOCAL_DB === 'true'
   : process.env.USE_MEMORY_DB === 'true'
     ? '../models/pet-memory'
     : '../models/pet';
-const { getAll, getById, create, deleteById } = require(modelPath);
+const { getAll, getBySpecies, getById, create, deleteById } = require(modelPath);
 
-// GET / — List all pets
+// GET / — List all pets (optionally filtered by species)
 router.get('/', async (req, res, next) => {
   try {
+    const { species } = req.query;
+    if (species) {
+      if (typeof species !== 'string' || !/^[A-Za-z]+$/.test(species)) {
+        return res.status(400).json({ error: 'Invalid species parameter. Only alphabetic characters are allowed.' });
+      }
+      const pets = await getBySpecies(species);
+      return res.status(200).json(pets);
+    }
     const pets = await getAll();
     res.status(200).json(pets);
   } catch (err) {
