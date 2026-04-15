@@ -32,6 +32,11 @@ async function getAll() {
   return readDb();
 }
 
+async function getBySpecies(species) {
+  const pets = readDb();
+  return pets.filter((p) => p.species === species);
+}
+
 async function getById(id) {
   const pets = readDb();
   return pets.find((p) => p.petId === id) || null;
@@ -54,4 +59,4 @@ async function deleteById(id) {
   return deleted;
 }
 
-module.exports = { getAll, getById, create, deleteById };
+module.exports = { getAll, getBySpecies, getById, create, deleteById };

@@ -1,5 +1,5 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, ScanCommand, GetCommand, PutCommand, DeleteCommand } = require('@aws-sdk/lib-dynamodb');
+const { DynamoDBDocumentClient, ScanCommand, GetCommand, PutCommand, DeleteCommand, QueryCommand } = require('@aws-sdk/lib-dynamodb');
 const { v4: uuidv4 } = require('uuid');
 
 const clientConfig = {};
@@ -15,6 +15,17 @@ const TABLE_NAME = process.env.TABLE_NAME || 'Pets';
 
 async function getAll() {
   const result = await docClient.send(new ScanCommand({ TableName: TABLE_NAME }));
+  return result.Items || [];
+}
+
+async function getBySpecies(species) {
+  const result = await docClient.send(new QueryCommand({
+    TableName: TABLE_NAME,
+    IndexName: 'species-index',
+    KeyConditionExpression: '#s = :species',
+    ExpressionAttributeNames: { '#s': 'species' },
+    ExpressionAttributeValues: { ':species': species },
+  }));
   return result.Items || [];
 }
 
@@ -50,4 +61,4 @@ async function deleteById(id) {
   return existing;
 }
 
-module.exports = { getAll, getById, create, deleteById };
+module.exports = { getAll, getBySpecies, getById, create, deleteById };

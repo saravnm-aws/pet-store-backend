@@ -13,6 +13,10 @@ async function getAll() {
   return Array.from(pets.values());
 }
 
+async function getBySpecies(species) {
+  return Array.from(pets.values()).filter(pet => pet.species === species);
+}
+
 async function getById(id) {
   return pets.get(id) || null;
 }
@@ -30,4 +34,4 @@ async function deleteById(id) {
   return existing;
 }
 
-module.exports = { getAll, getById, create, deleteById };
+module.exports = { getAll, getBySpecies, getById, create, deleteById };

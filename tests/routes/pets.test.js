@@ -78,6 +78,44 @@ describe('DELETE /api/pets/:id', () => {
   });
 });
 
+describe('GET /api/pets?species=...', () => {
+  it('returns 200 and filtered pets when species is provided', async () => {
+    petModel.getBySpecies.mockResolvedValue([samplePet]);
+    const res = await request(app).get('/api/pets?species=Dog');
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual([samplePet]);
+    expect(petModel.getBySpecies).toHaveBeenCalledWith('Dog');
+    expect(petModel.getAll).not.toHaveBeenCalled();
+  });
+
+  it('returns 200 and empty array when species has no matches', async () => {
+    petModel.getBySpecies.mockResolvedValue([]);
+    const res = await request(app).get('/api/pets?species=Bird');
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual([]);
+  });
+
+  it('calls getAll when no species param is provided', async () => {
+    petModel.getAll.mockResolvedValue([samplePet]);
+    const res = await request(app).get('/api/pets');
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual([samplePet]);
+    expect(petModel.getAll).toHaveBeenCalled();
+  });
+
+  it('returns 400 for invalid species parameter with special characters', async () => {
+    const res = await request(app).get('/api/pets?species=Dog%3BDROP');
+    expect(res.status).toBe(400);
+    expect(res.body.error).toMatch(/Invalid species/);
+  });
+
+  it('returns 400 for species parameter with spaces', async () => {
+    const res = await request(app).get('/api/pets?species=Golden%20Dog');
+    expect(res.status).toBe(400);
+    expect(res.body.error).toMatch(/Invalid species/);
+  });
+});
+
 describe('GET /api/health', () => {
   it('returns 200 with status ok', async () => {
     const res = await request(app).get('/api/health');
