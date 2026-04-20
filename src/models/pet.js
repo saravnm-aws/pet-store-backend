@@ -1,5 +1,5 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, ScanCommand, GetCommand, PutCommand, DeleteCommand } = require('@aws-sdk/lib-dynamodb');
+const { DynamoDBDocumentClient, ScanCommand, GetCommand, PutCommand, DeleteCommand, UpdateCommand } = require('@aws-sdk/lib-dynamodb');
 const { v4: uuidv4 } = require('uuid');
 
 const clientConfig = {};
@@ -50,4 +50,39 @@ async function deleteById(id) {
   return existing;
 }
 
-module.exports = { getAll, getById, create, deleteById };
+async function updateById(id, data) {
+  const existing = await getById(id);
+  if (!existing) {
+    return null;
+  }
+
+  const fields = Object.keys(data).filter((k) => k !== 'petId');
+  if (fields.length === 0) {
+    return existing;
+  }
+
+  const ExpressionAttributeNames = {};
+  const ExpressionAttributeValues = {};
+  const updateParts = [];
+
+  fields.forEach((key) => {
+    const attrName = `#${key}`;
+    const attrValue = `:${key}`;
+    ExpressionAttributeNames[attrName] = key;
+    ExpressionAttributeValues[attrValue] = data[key];
+    updateParts.push(`${attrName} = ${attrValue}`);
+  });
+
+  const result = await docClient.send(new UpdateCommand({
+    TableName: TABLE_NAME,
+    Key: { petId: id },
+    UpdateExpression: `SET ${updateParts.join(', ')}`,
+    ExpressionAttributeNames,
+    ExpressionAttributeValues,
+    ReturnValues: 'ALL_NEW',
+  }));
+
+  return result.Attributes;
+}
+
+module.exports = { getAll, getById, create, deleteById, updateById };

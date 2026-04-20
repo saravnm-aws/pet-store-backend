@@ -5,7 +5,7 @@ const modelPath = process.env.USE_LOCAL_DB === 'true'
   : process.env.USE_MEMORY_DB === 'true'
     ? '../models/pet-memory'
     : '../models/pet';
-const { getAll, getById, create, deleteById } = require(modelPath);
+const { getAll, getById, create, deleteById, updateById } = require(modelPath);
 
 // GET / — List all pets
 router.get('/', async (req, res, next) => {
@@ -45,6 +45,29 @@ router.post('/', async (req, res, next) => {
 
     const pet = await create(req.body);
     res.status(201).json(pet);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// PUT /:id — Update a pet
+router.put('/:id', async (req, res, next) => {
+  try {
+    const { name, species, price } = req.body;
+    const missingFields = [];
+    if (!name) missingFields.push('name');
+    if (!species) missingFields.push('species');
+    if (price === undefined || price === null) missingFields.push('price');
+
+    if (missingFields.length > 0) {
+      return res.status(400).json({ error: `Missing required fields: ${missingFields.join(', ')}` });
+    }
+
+    const pet = await updateById(req.params.id, req.body);
+    if (!pet) {
+      return res.status(404).json({ error: 'Pet not found' });
+    }
+    res.status(200).json(pet);
   } catch (err) {
     next(err);
   }
