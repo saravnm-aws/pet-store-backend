@@ -30,4 +30,12 @@ async function deleteById(id) {
   return existing;
 }
 
-module.exports = { getAll, getById, create, deleteById };
+async function updateById(id, data) {
+  const existing = pets.get(id);
+  if (!existing) return null;
+  const updated = { ...existing, ...data, petId: id };
+  pets.set(id, updated);
+  return updated;
+}
+
+module.exports = { getAll, getById, create, deleteById, updateById };

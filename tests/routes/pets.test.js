@@ -63,6 +63,35 @@ describe('POST /api/pets', () => {
   });
 });
 
+describe('PUT /api/pets/:id', () => {
+  it('returns 200 and updated pet when pet exists', async () => {
+    const input = { name: 'Buddy Updated', species: 'Dog', breed: 'Labrador', age: 4, price: 349.99, description: 'An updated friendly dog' };
+    const updatedPet = { petId: 'test-001', ...input };
+    petModel.updateById.mockResolvedValue(updatedPet);
+
+    const res = await request(app).put('/api/pets/test-001').send(input);
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual(updatedPet);
+  });
+
+  it('returns 404 when pet does not exist', async () => {
+    const input = { name: 'Ghost', species: 'Cat', price: 100 };
+    petModel.updateById.mockResolvedValue(null);
+
+    const res = await request(app).put('/api/pets/nonexistent').send(input);
+    expect(res.status).toBe(404);
+    expect(res.body).toEqual({ error: 'Pet not found' });
+  });
+
+  it('returns 400 with missing fields listed when body is empty', async () => {
+    const res = await request(app).put('/api/pets/test-001').send({});
+    expect(res.status).toBe(400);
+    expect(res.body.error).toMatch(/name/);
+    expect(res.body.error).toMatch(/species/);
+    expect(res.body.error).toMatch(/price/);
+  });
+});
+
 describe('DELETE /api/pets/:id', () => {
   it('returns 200 when pet exists', async () => {
     petModel.deleteById.mockResolvedValue(samplePet);

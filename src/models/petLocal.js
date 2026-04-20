@@ -54,4 +54,14 @@ async function deleteById(id) {
   return deleted;
 }
 
-module.exports = { getAll, getById, create, deleteById };
+async function updateById(id, data) {
+  const pets = readDb();
+  const index = pets.findIndex((p) => p.petId === id);
+  if (index === -1) return null;
+  const updated = { ...pets[index], ...data, petId: id };
+  pets[index] = updated;
+  writeDb(pets);
+  return updated;
+}
+
+module.exports = { getAll, getById, create, deleteById, updateById };
