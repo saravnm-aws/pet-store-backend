@@ -10,7 +10,7 @@ const samplePet = {
   species: 'Dog',
   breed: 'Golden Retriever',
   age: 3,
-  price: 299.99,
+  price: 24999,
   description: 'A friendly dog',
   status: 'available',
 };
@@ -29,9 +29,9 @@ describe('GET /api/pets', () => {
 
   it('returns only pets matching status query parameter', async () => {
     const pets = [
-      { petId: '1', name: 'Buddy', species: 'Dog', price: 100, status: 'available' },
-      { petId: '2', name: 'Whiskers', species: 'Cat', price: 50, status: 'pending' },
-      { petId: '3', name: 'Polly', species: 'Bird', price: 200, status: 'adopted' },
+      { petId: '1', name: 'Buddy', species: 'Dog', price: 8300, status: 'available' },
+      { petId: '2', name: 'Whiskers', species: 'Cat', price: 4150, status: 'pending' },
+      { petId: '3', name: 'Polly', species: 'Bird', price: 16600, status: 'adopted' },
     ];
     petModel.getAll.mockResolvedValue(pets);
     const res = await request(app).get('/api/pets?status=available');
@@ -58,7 +58,7 @@ describe('GET /api/pets/:id', () => {
 
 describe('POST /api/pets', () => {
   it('returns 201 and the created pet when all fields provided', async () => {
-    const input = { name: 'Buddy', species: 'Dog', breed: 'Golden Retriever', age: 3, price: 299.99, description: 'A friendly dog' };
+    const input = { name: 'Buddy', species: 'Dog', breed: 'Golden Retriever', age: 3, price: 24999, description: 'A friendly dog' };
     const created = { petId: 'new-id', ...input };
     petModel.create.mockResolvedValue(created);
 
@@ -76,7 +76,7 @@ describe('POST /api/pets', () => {
   });
 
   it('defaults status to available when not provided', async () => {
-    const input = { name: 'Buddy', species: 'Dog', price: 299.99 };
+    const input = { name: 'Buddy', species: 'Dog', price: 24999 };
     const created = { petId: 'new-id', ...input, status: 'available' };
     petModel.create.mockResolvedValue(created);
 
@@ -89,7 +89,7 @@ describe('POST /api/pets', () => {
 
 describe('PUT /api/pets/:id', () => {
   it('returns 200 and updated pet when pet exists', async () => {
-    const input = { name: 'Buddy Updated', species: 'Dog', breed: 'Labrador', age: 4, price: 349.99, description: 'An updated friendly dog' };
+    const input = { name: 'Buddy Updated', species: 'Dog', breed: 'Labrador', age: 4, price: 28999, description: 'An updated friendly dog' };
     const updatedPet = { petId: 'test-001', ...input };
     petModel.updateById.mockResolvedValue(updatedPet);
 
@@ -99,7 +99,7 @@ describe('PUT /api/pets/:id', () => {
   });
 
   it('returns 404 when pet does not exist', async () => {
-    const input = { name: 'Ghost', species: 'Cat', price: 100 };
+    const input = { name: 'Ghost', species: 'Cat', price: 8300 };
     petModel.updateById.mockResolvedValue(null);
 
     const res = await request(app).put('/api/pets/nonexistent').send(input);
