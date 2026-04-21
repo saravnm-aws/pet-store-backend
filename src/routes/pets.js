@@ -10,7 +10,10 @@ const { getAll, getById, create, deleteById, updateById } = require(modelPath);
 // GET / — List all pets
 router.get('/', async (req, res, next) => {
   try {
-    const pets = await getAll();
+    let pets = await getAll();
+    if (req.query.status) {
+      pets = pets.filter(pet => pet.status === req.query.status);
+    }
     res.status(200).json(pets);
   } catch (err) {
     next(err);
@@ -43,6 +46,9 @@ router.post('/', async (req, res, next) => {
       return res.status(400).json({ error: `Missing required fields: ${missingFields.join(', ')}` });
     }
 
+    if (!req.body.status) {
+      req.body.status = 'available';
+    }
     const pet = await create(req.body);
     res.status(201).json(pet);
   } catch (err) {
@@ -64,6 +70,24 @@ router.put('/:id', async (req, res, next) => {
     }
 
     const pet = await updateById(req.params.id, req.body);
+    if (!pet) {
+      return res.status(404).json({ error: 'Pet not found' });
+    }
+    res.status(200).json(pet);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// PATCH /:id/status — Update pet adoption status
+router.patch('/:id/status', async (req, res, next) => {
+  try {
+    const allowedStatuses = ['available', 'pending', 'adopted'];
+    const { status } = req.body;
+    if (!status || !allowedStatuses.includes(status)) {
+      return res.status(400).json({ error: `Invalid status. Allowed values: ${allowedStatuses.join(', ')}` });
+    }
+    const pet = await updateById(req.params.id, { status });
     if (!pet) {
       return res.status(404).json({ error: 'Pet not found' });
     }
