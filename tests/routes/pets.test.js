@@ -12,6 +12,7 @@ const samplePet = {
   age: 3,
   price: 299.99,
   description: 'A friendly dog',
+  status: 'available',
 };
 
 afterEach(() => {
@@ -24,6 +25,18 @@ describe('GET /api/pets', () => {
     const res = await request(app).get('/api/pets');
     expect(res.status).toBe(200);
     expect(res.body).toEqual([]);
+  });
+
+  it('returns only pets matching status query parameter', async () => {
+    const pets = [
+      { petId: '1', name: 'Buddy', species: 'Dog', price: 100, status: 'available' },
+      { petId: '2', name: 'Whiskers', species: 'Cat', price: 50, status: 'pending' },
+      { petId: '3', name: 'Polly', species: 'Bird', price: 200, status: 'adopted' },
+    ];
+    petModel.getAll.mockResolvedValue(pets);
+    const res = await request(app).get('/api/pets?status=available');
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual([pets[0]]);
   });
 });
 
@@ -61,6 +74,17 @@ describe('POST /api/pets', () => {
     expect(res.body.error).toMatch(/species/);
     expect(res.body.error).toMatch(/price/);
   });
+
+  it('defaults status to available when not provided', async () => {
+    const input = { name: 'Buddy', species: 'Dog', price: 299.99 };
+    const created = { petId: 'new-id', ...input, status: 'available' };
+    petModel.create.mockResolvedValue(created);
+
+    await request(app).post('/api/pets').send(input);
+    expect(petModel.create).toHaveBeenCalledWith(
+      expect.objectContaining({ status: 'available' })
+    );
+  });
 });
 
 describe('PUT /api/pets/:id', () => {
@@ -89,6 +113,38 @@ describe('PUT /api/pets/:id', () => {
     expect(res.body.error).toMatch(/name/);
     expect(res.body.error).toMatch(/species/);
     expect(res.body.error).toMatch(/price/);
+  });
+});
+
+describe('PATCH /api/pets/:id/status', () => {
+  it('returns 200 and updated pet when status is valid', async () => {
+    const updatedPet = { ...samplePet, status: 'pending' };
+    petModel.updateById.mockResolvedValue(updatedPet);
+
+    const res = await request(app).patch('/api/pets/test-001/status').send({ status: 'pending' });
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual(updatedPet);
+    expect(petModel.updateById).toHaveBeenCalledWith('test-001', { status: 'pending' });
+  });
+
+  it('returns 400 when status is invalid', async () => {
+    const res = await request(app).patch('/api/pets/test-001/status').send({ status: 'invalid' });
+    expect(res.status).toBe(400);
+    expect(res.body.error).toMatch(/Invalid status/);
+  });
+
+  it('returns 400 when no status provided', async () => {
+    const res = await request(app).patch('/api/pets/test-001/status').send({});
+    expect(res.status).toBe(400);
+    expect(res.body.error).toMatch(/Invalid status/);
+  });
+
+  it('returns 404 when pet does not exist', async () => {
+    petModel.updateById.mockResolvedValue(null);
+
+    const res = await request(app).patch('/api/pets/test-001/status').send({ status: 'adopted' });
+    expect(res.status).toBe(404);
+    expect(res.body).toEqual({ error: 'Pet not found' });
   });
 });
 
