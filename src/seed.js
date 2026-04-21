@@ -12,11 +12,11 @@ const client = new DynamoDBClient(clientConfig);
 const docClient = DynamoDBDocumentClient.from(client);
 
 const SEED_PETS = [
-  { petId: 'seed-001', name: 'Buddy', species: 'Dog', breed: 'Golden Retriever', age: 3, price: 299.99, status: 'available' },
-  { petId: 'seed-002', name: 'Whiskers', species: 'Cat', breed: 'Siamese', age: 2, price: 149.99, status: 'available' },
-  { petId: 'seed-003', name: 'Polly', species: 'Bird', breed: 'Macaw', age: 5, price: 499.99, status: 'available' },
-  { petId: 'seed-004', name: 'Shelly', species: 'Reptile', breed: 'Red-Eared Slider', age: 4, price: 79.99, status: 'available' },
-  { petId: 'seed-005', name: 'Nemo', species: 'Fish', breed: 'Clownfish', age: 1, price: 29.99, status: 'available' },
+  { petId: 'seed-001', name: 'Buddy', species: 'Dog', breed: 'Golden Retriever', age: 3, price: 24999, status: 'available' },
+  { petId: 'seed-002', name: 'Whiskers', species: 'Cat', breed: 'Siamese', age: 2, price: 12499, status: 'available' },
+  { petId: 'seed-003', name: 'Polly', species: 'Bird', breed: 'Macaw', age: 5, price: 41999, status: 'available' },
+  { petId: 'seed-004', name: 'Shelly', species: 'Reptile', breed: 'Red-Eared Slider', age: 4, price: 6599, status: 'available' },
+  { petId: 'seed-005', name: 'Nemo', species: 'Fish', breed: 'Clownfish', age: 1, price: 2499, status: 'available' },
 ];
 
 async function ensureTableExists() {

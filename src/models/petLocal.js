@@ -10,11 +10,11 @@ function readDb() {
     const dir = path.dirname(DB_PATH);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     const seed = [
-      { petId: 'seed-001', name: 'Buddy', species: 'Dog', breed: 'Golden Retriever', age: 3, price: 299.99, description: 'A friendly golden retriever', status: 'available' },
-      { petId: 'seed-002', name: 'Whiskers', species: 'Cat', breed: 'Siamese', age: 2, price: 149.99, description: 'A curious siamese cat', status: 'available' },
-      { petId: 'seed-003', name: 'Polly', species: 'Bird', breed: 'Macaw', age: 5, price: 499.99, description: 'A colorful macaw', status: 'available' },
-      { petId: 'seed-004', name: 'Shelly', species: 'Reptile', breed: 'Red-Eared Slider', age: 4, price: 79.99, description: 'A calm turtle', status: 'available' },
-      { petId: 'seed-005', name: 'Nemo', species: 'Fish', breed: 'Clownfish', age: 1, price: 29.99, description: 'A bright clownfish', status: 'available' },
+      { petId: 'seed-001', name: 'Buddy', species: 'Dog', breed: 'Golden Retriever', age: 3, price: 24999, description: 'A friendly golden retriever', status: 'available' },
+      { petId: 'seed-002', name: 'Whiskers', species: 'Cat', breed: 'Siamese', age: 2, price: 12499, description: 'A curious siamese cat', status: 'available' },
+      { petId: 'seed-003', name: 'Polly', species: 'Bird', breed: 'Macaw', age: 5, price: 41999, description: 'A colorful macaw', status: 'available' },
+      { petId: 'seed-004', name: 'Shelly', species: 'Reptile', breed: 'Red-Eared Slider', age: 4, price: 6599, description: 'A calm turtle', status: 'available' },
+      { petId: 'seed-005', name: 'Nemo', species: 'Fish', breed: 'Clownfish', age: 1, price: 2499, description: 'A bright clownfish', status: 'available' },
     ];
     fs.writeFileSync(DB_PATH, JSON.stringify(seed, null, 2));
     return seed;
